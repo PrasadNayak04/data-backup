@@ -1,0 +1,12 @@
+15
+14 Spring boot jdbc example programs,lombok constructors
+13 Spring and spring boot JDBC template
+12 Rest API, started with spring boot maven application
+9 sql insurance
+8 spring library case study assignment
+7 AUTOWIRING, aNNOTATIONS, 
+6 CONSTRUCTOR AND SETTER DEPENDENCY INJECTION
+  SEETER DEPENDENT OBJECT, CONSTRUCTOR DEPENDENT OBJECT
+5 SPRING FRAMEWORK AND BEAN CLASSES
+2 joins assignments
+1 SQL joins and aggregate functions

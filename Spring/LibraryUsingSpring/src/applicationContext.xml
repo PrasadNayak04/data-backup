@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="book1"
+          class="com.robosoft.library.Book">
+        <constructor-arg value="Thunthuru" />
+        <constructor-arg value="Ravikrishna" />
+    </bean>
+
+    <bean id="book2"
+          class="com.robosoft.library.Book">
+        <constructor-arg value="Thunthuru2" />
+        <constructor-arg value="harisha" />
+    </bean>
+
+    <bean id="borrower1"
+          class="com.robosoft.library.Borrower" autowire="byName">
+        <constructor-arg value="100" type="int"/>
+        <constructor-arg value="Kiran"/>
+        <constructor-arg value="Thunthuru"/>
+    </bean>
+
+    <bean id="borrower2"
+          class="com.robosoft.library.Borrower" autowire="byName">
+        <constructor-arg value="101" type="int"/>
+        <constructor-arg value="Shivaraj"/>
+        <constructor-arg value="Thunthuru2"/>
+    </bean>
+
+    <bean id="clerk"
+          class="com.robosoft.library.Clerk">
+        <constructor-arg value="10" type="int"/>
+        <constructor-arg value="Clerk Suresh"/>
+    </bean>
+
+    <bean id="librarian"
+          class="com.robosoft.library.Librarian">
+        <constructor-arg value="50" type="int"/>
+        <constructor-arg value="Sandesh"/>
+    </bean>
+
+    <bean id="library"
+          class="com.robosoft.library.Library">
+        <constructor-arg value="Udupi Library"/>
+        <property name="librarian" ref="librarian"/>
+        <property name="clerk" ref="clerk"/>
+        <property name="borrowers">
+            <list>
+                <ref bean="borrower1"></ref>
+                <ref bean="borrower2"></ref>
+            </list>
+        </property>
+        <property name="books">
+            <list>
+                <ref bean="book1"></ref>
+                <ref bean="book2"></ref>
+            </list>
+        </property>
+    </bean>
+
+
+
+
+
+
+
+</beans>
+
+
+
+
+

@@ -1,0 +1,787 @@
+mysql> use Insurance;
+Database changed
+
+mysql> create table Person(driver_id varchar(10), name char(20), address varchar(20), primary key(driver_id));
+Query OK, 0 rows affected (0.21 sec)
+
+mysql> create table Car(regno varchar(10) primary key, model varchar(20), year int);
+Query OK, 0 rows affected (0.13 sec)
+
+mysql> create table Accident(report_number int primary key, accd_date date, location varchar(20));
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> create table Owns(driver_id varchar(10), regno varchar(10) unique, foreign key (driver_id) references Person(driver_id), foreign key (regno) references Car(regno));
+Query OK, 0 rows affected (0.22 sec)
+
+
+mysql> desc accident;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| report_number | int         | NO   | PRI | NULL    |       |
+| accd_date     | date        | YES  |     | NULL    |       |
+| location      | varchar(20) | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+3 rows in set (0.01 sec)
+
+mysql> alter table add foreign key (regno) references Car(regno);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'add foreign key (regno) references Car(regno)' at line 1
+mysql> alter table Participated add foreign key (regno) references Car(regno);
+Query OK, 0 rows affected (0.22 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table Participated add foreign key (report_number) references Accident(report_number);
+ERROR 3780 (HY000): Referencing column 'report_number' and referenced column 'report_number' in foreign key constraint 'participated_ibfk_3' are incompatible.
+mysql> desc participated
+    -> ;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| driver_id     | varchar(10) | YES  | MUL | NULL    |       |
+| regno         | varchar(10) | YES  | MUL | NULL    |       |
+| report_number | varchar(10) | YES  |     | NULL    |       |
+| damage_amount | int         | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> alter table participated modify report_number int;
+Query OK, 0 rows affected (0.23 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table Participated add foreign key (report_number) references Accident(report_number);
+Query OK, 0 rows affected (0.31 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc participated;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| driver_id     | varchar(10) | YES  | MUL | NULL    |       |
+| regno         | varchar(10) | YES  | MUL | NULL    |       |
+| report_number | int         | YES  | MUL | NULL    |       |
+| damage_amount | int         | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> insert into person vlues("Driver100", "Rajesh", "Karkala");
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'vlues("Driver100", "Rajesh", "Karkala")' at line 1
+mysql> insert into person values("Driver100", "Rajesh", "Karkala");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into person values("Driver101", "Shiva", "Bailuru");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into person values("Driver102", "Akshay", "Hiriadka");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into person values("Driver103", "Krishna", "Moodbidri");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into person values("Driver103", "Krishna", "Moodbidri");
+ERROR 1062 (23000): Duplicate entry 'Driver103' for key 'person.PRIMARY'
+mysql> insert into person values("Driver104", "Rajendra", "Ajekar");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from person;
++-----------+----------+-----------+
+| driver_id | name     | address   |
++-----------+----------+-----------+
+| Driver100 | Rajesh   | Karkala   |
+| Driver101 | Shiva    | Bailuru   |
+| Driver102 | Akshay   | Hiriadka  |
+| Driver103 | Krishna  | Moodbidri |
+| Driver104 | Rajendra | Ajekar    |
++-----------+----------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> insert into car values("KA20EA2545", "Baleno", 2019);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into car values("KA20EA2789", "brezza", 1985);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into car values("KA20ED2489", "omni", 1988);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into car values("KA20AF2445", "Scorpio", 1984);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into car values("KA20EA2418", "Mahindra", 1985);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from car;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 2019 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+5 rows in set (0.00 sec)
+
+mysql> update car set yeat = 1986 wheremodel = "baleno"
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'wheremodel = "baleno"' at line 1
+mysql> update car set year = 1986 wheremodel = "baleno"
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'wheremodel = "baleno"' at line 1
+mysql> update car set year = 1986 where model = "baleno"
+    -> ;
+Query OK, 1 row affected (0.02 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from car;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 1986 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+5 rows in set (0.00 sec)
+
+mysql>
+mysql> update car set yeat = 1986 wheremodel = "baleno"
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    ->
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'wheremodel = "baleno"' at line 1
+mysql> insert into accident values(
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+mysql> alter table owns add primary key(driver_id,regno);
+Query OK, 0 rows affected (0.28 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> descowns;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'descowns' at line 1
+mysql> desc owns;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| driver_id | varchar(10) | NO   | PRI | NULL    |       |
+| regno     | varchar(10) | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> insert into accident values(2001,"1989-08-25", "Santhekatte");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into accident values(2002,"1989-07-24", "Laxminagar");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into accident values(2003,"1985-02-20", "Kalsanka");
+Query OK, 1 row affected (0.07 sec)
+
+mysql> insert into accident values(2004,"1984-05-13", "Karavali Bypass");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> insert into accident values(2004,"1989-06-32", "Malpe");
+ERROR 1292 (22007): Incorrect date value: '1989-06-32' for column 'accd_date' at row 1
+mysql> insert into accident values(2004,"1989-06-31", "Malpe");
+ERROR 1292 (22007): Incorrect date value: '1989-06-31' for column 'accd_date' at row 1
+mysql> insert into accident values(2004,"1989-06-30", "Malpe");
+ERROR 1062 (23000): Duplicate entry '2004' for key 'accident.PRIMARY'
+mysql> insert into accident values(2005,"1989-06-30", "Malpe");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select * from accident;
++---------------+------------+-----------------+
+| report_number | accd_date  | location        |
++---------------+------------+-----------------+
+|          2001 | 1989-08-25 | Santhekatte     |
+|          2002 | 1989-07-24 | Laxminagar      |
+|          2003 | 1985-02-20 | Kalsanka        |
+|          2004 | 1984-05-13 | Karavali Bypass |
+|          2005 | 1989-06-30 | Malpe           |
++---------------+------------+-----------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from person;
++-----------+----------+-----------+
+| driver_id | name     | address   |
++-----------+----------+-----------+
+| Driver100 | Rajesh   | Karkala   |
+| Driver101 | Shiva    | Bailuru   |
+| Driver102 | Akshay   | Hiriadka  |
+| Driver103 | Krishna  | Moodbidri |
+| Driver104 | Rajendra | Ajekar    |
++-----------+----------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> select * from car;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 1986 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+5 rows in set (0.00 sec)
+
+mysql> insert into owns values("driver_100", "KA20EA2545");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`owns`, CONSTRAINT `owns_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `person` (`driver_id`))
+mysql> desc person;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| driver_id | varchar(10) | NO   | PRI | NULL    |       |
+| name      | char(20)    | YES  |     | NULL    |       |
+| address   | varchar(20) | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc owns;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| driver_id | varchar(10) | NO   | PRI | NULL    |       |
+| regno     | varchar(10) | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> insert into owns values("driver_100", "KA20EA2545");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`owns`, CONSTRAINT `owns_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `person` (`driver_id`))
+mysql> insert into owns values("driver100", "KA20EA2545");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into owns values("driver100", "KA20EA2418");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into owns values("driver100", "KA20EA2418");
+ERROR 1062 (23000): Duplicate entry 'driver100-KA20EA2418' for key 'owns.PRIMARY'
+mysql> insert into participated("driver100", "KA20AF2445",2001,45000);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"driver100", "KA20AF2445",2001,45000)' at line 1
+mysql> insert into participated values ("driver100", "KA20AF2445",2001,45000);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> delete from participated;
+Query OK, 1 row affected (0.03 sec)
+
+mysql> drop table participated;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> create table Participated(driver_id varchar(10), regno varchar(10),report_number int, damage_amount int, foreign key (driver_id, regno) references owns(driver_id, regno), foreign key (report_number) references accident(report_number));
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> insert into participated values("diver100","KA20AF2445",2001,45000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`participated`, CONSTRAINT `participated_ibfk_1` FOREIGN KEY (`driver_id`, `regno`) REFERENCES `owns` (`driver_id`, `regno`))
+mysql> insert into participated values("diver100","KA20EA2418",2001,45000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`participated`, CONSTRAINT `participated_ibfk_1` FOREIGN KEY (`driver_id`, `regno`) REFERENCES `owns` (`driver_id`, `regno`))
+mysql> insert into participated values("driver100","KA20EA2418",2001,45000);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into participated values("diver100","KA20AF2418",2001,45000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`participated`, CONSTRAINT `participated_ibfk_1` FOREIGN KEY (`driver_id`, `regno`) REFERENCES `owns` (`driver_id`, `regno`))
+mysql> insert into participated values("driver100","KA20AF2418",2001,45000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`participated`, CONSTRAINT `participated_ibfk_1` FOREIGN KEY (`driver_id`, `regno`) REFERENCES `owns` (`driver_id`, `regno`))
+mysql> insert into participated values ("driver100", "KA20AF2445",2001,45000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`participated`, CONSTRAINT `participated_ibfk_1` FOREIGN KEY (`driver_id`, `regno`) REFERENCES `owns` (`driver_id`, `regno`))
+mysql> insert into participated values ("driver100", "KA20EA2418",2001,45000);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into owns values("driver105", "KA20EA2418");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`owns`, CONSTRAINT `owns_ibfk_1` FOREIGN KEY (`driver_id`) REFERENCES `person` (`driver_id`))
+mysql> insert into owns values("driver104", "KA20EA2418");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into owns values("driver104", "KA20EA2418");
+ERROR 1062 (23000): Duplicate entry 'driver104-KA20EA2418' for key 'owns.PRIMARY'
+mysql> dlete from owns;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'dlete from owns' at line 1
+mysql> delete from owns;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`insurance`.`participated`, CONSTRAINT `participated_ibfk_1` FOREIGN KEY (`driver_id`, `regno`) REFERENCES `owns` (`driver_id`, `regno`))
+mysql> dlete from participated;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'dlete from participated' at line 1
+mysql> delete from participated;
+Query OK, 2 rows affected (0.01 sec)
+
+mysql> delete from owns;
+Query OK, 3 rows affected (0.02 sec)
+
+mysql> alter table participated add primary key(driver_id,regno,report_number);
+Query OK, 0 rows affected (0.20 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from person;
++-----------+----------+-----------+
+| driver_id | name     | address   |
++-----------+----------+-----------+
+| Driver100 | Rajesh   | Karkala   |
+| Driver101 | Shiva    | Bailuru   |
+| Driver102 | Akshay   | Hiriadka  |
+| Driver103 | Krishna  | Moodbidri |
+| Driver104 | Rajendra | Ajekar    |
++-----------+----------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> select * from car;;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 1986 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+5 rows in set (0.00 sec)
+
+ERROR:
+No query specified
+
+mysql> alter table owns add primary key(regno);
+ERROR 1068 (42000): Multiple primary key defined
+mysql> alter table owns modify regno not null;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'not null' at line 1
+mysql> alter table owns modify regno notnull;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'notnull' at line 1
+mysql> alter table own alter column regno add constraint not null;;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'add constraint not null' at line 1
+ERROR:
+No query specified
+
+mysql> alter table own alter column regno add constraint notnull;;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'add constraint notnull' at line 1
+ERROR:
+No query specified
+
+mysql> alter table own alter column regno add constraint notnull;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'add constraint notnull' at line 1
+mysql> alter table own add unique(reno);
+ERROR 1146 (42S02): Table 'insurance.own' doesn't exist
+mysql> alter table owns add unique(reno);
+ERROR 1072 (42000): Key column 'reno' doesn't exist in table
+mysql> alter table owns add unique(regno);
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc owns;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| driver_id | varchar(10) | NO   | PRI | NULL    |       |
+| regno     | varchar(10) | NO   | PRI | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> select * from car;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 1986 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+5 rows in set (0.00 sec)
+
+mysql> select * from person;
++-----------+----------+-----------+
+| driver_id | name     | address   |
++-----------+----------+-----------+
+| Driver100 | Rajesh   | Karkala   |
+| Driver101 | Shiva    | Bailuru   |
+| Driver102 | Akshay   | Hiriadka  |
+| Driver103 | Krishna  | Moodbidri |
+| Driver104 | Rajendra | Ajekar    |
++-----------+----------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> insert into owns values("driver100", "KA20EA2545");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into owns values("driver101", "KA20EA2545");
+ERROR 1062 (23000): Duplicate entry 'KA20EA2545' for key 'owns.regno'
+mysql> insert into owns values("driver100", "KA20AF2445");
+Query OK, 1 row affected (0.11 sec)
+
+mysql> insert into owns values("driver101", "KA20AF2445");
+ERROR 1062 (23000): Duplicate entry 'KA20AF2445' for key 'owns.regno'
+mysql> insert into owns values("driver101", "KA20AF2418");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`owns`, CONSTRAINT `owns_ibfk_2` FOREIGN KEY (`regno`) REFERENCES `car` (`regno`))
+mysql> insert into owns values("driver101", "KA20EA2418");
+Query OK, 1 row affected (0.07 sec)
+
+mysql> select * from owns;
++-----------+------------+
+| driver_id | regno      |
++-----------+------------+
+| driver100 | KA20AF2445 |
+| driver101 | KA20EA2418 |
+| driver100 | KA20EA2545 |
++-----------+------------+
+3 rows in set (0.00 sec)
+
+mysql> insert into owns values("driver103", "KA20ED2489");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into owns values("driver104", "KA20ED2489");
+ERROR 1062 (23000): Duplicate entry 'KA20ED2489' for key 'owns.regno'
+mysql> insert into owns values("driver104", "KA20EA2789");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from owns;
++-----------+------------+
+| driver_id | regno      |
++-----------+------------+
+| driver100 | KA20AF2445 |
+| driver101 | KA20EA2418 |
+| driver100 | KA20EA2545 |
+| driver104 | KA20EA2789 |
+| driver103 | KA20ED2489 |
++-----------+------------+
+5 rows in set (0.00 sec)
+
+mysql> alter table participated add unique(report_number);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> insert into owns participated("driver100", "KA20EA2789",2001,47800);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'participated("driver100", "KA20EA2789",2001,47800)' at line 1
+mysql> insert into owns participated values("driver100", "KA20EA2789",2001,47800);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'participated values("driver100", "KA20EA2789",2001,47800)' at line 1
+mysql> insert into participated values("driver100", "KA20EA2789",2001,47800);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`insurance`.`participated`, CONSTRAINT `participated_ibfk_1` FOREIGN KEY (`driver_id`, `regno`) REFERENCES `owns` (`driver_id`, `regno`))
+mysql> insert into participated values("driver100", "KA20AF2445",2001,47800);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from accident;
++---------------+------------+-----------------+
+| report_number | accd_date  | location        |
++---------------+------------+-----------------+
+|          2001 | 1989-08-25 | Santhekatte     |
+|          2002 | 1989-07-24 | Laxminagar      |
+|          2003 | 1985-02-20 | Kalsanka        |
+|          2004 | 1984-05-13 | Karavali Bypass |
+|          2005 | 1989-06-30 | Malpe           |
++---------------+------------+-----------------+
+5 rows in set (0.00 sec)
+
+mysql> insert into participated values("driver101", "KA20EA2418",2001,47800);
+ERROR 1062 (23000): Duplicate entry '2001' for key 'participated.report_number'
+mysql> insert into participated values("driver101", "KA20EA2418",2002,47800);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into participated values("driver103", "KA20ED2489",2005,83000);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into participated values("driver100", "KA20EA2545",2003,83000);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from person;
++-----------+----------+-----------+
+| driver_id | name     | address   |
++-----------+----------+-----------+
+| Driver100 | Rajesh   | Karkala   |
+| Driver101 | Shiva    | Bailuru   |
+| Driver102 | Akshay   | Hiriadka  |
+| Driver103 | Krishna  | Moodbidri |
+| Driver104 | Rajendra | Ajekar    |
++-----------+----------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> select * from car;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 1986 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+5 rows in set (0.00 sec)
+
+mysql> select * from accident;
++---------------+------------+-----------------+
+| report_number | accd_date  | location        |
++---------------+------------+-----------------+
+|          2001 | 1989-08-25 | Santhekatte     |
+|          2002 | 1989-07-24 | Laxminagar      |
+|          2003 | 1985-02-20 | Kalsanka        |
+|          2004 | 1984-05-13 | Karavali Bypass |
+|          2005 | 1989-06-30 | Malpe           |
++---------------+------------+-----------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from owns;
++-----------+------------+
+| driver_id | regno      |
++-----------+------------+
+| driver100 | KA20AF2445 |
+| driver101 | KA20EA2418 |
+| driver100 | KA20EA2545 |
+| driver104 | KA20EA2789 |
+| driver103 | KA20ED2489 |
++-----------+------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from participated;
++-----------+------------+---------------+---------------+
+| driver_id | regno      | report_number | damage_amount |
++-----------+------------+---------------+---------------+
+| driver100 | KA20AF2445 |          2001 |         47800 |
+| driver100 | KA20EA2545 |          2003 |         83000 |
+| driver101 | KA20EA2418 |          2002 |         47800 |
+| driver103 | KA20ED2489 |          2005 |         83000 |
++-----------+------------+---------------+---------------+
+4 rows in set (0.00 sec)
+
+mysql> select count(distinct driver_id) from participated
+    -> ;
++---------------------------+
+| count(distinct driver_id) |
++---------------------------+
+|                         3 |
++---------------------------+
+1 row in set (0.03 sec)
+
+mysql> select count(distinct driver_id) from participated p
+    -> inner join accident a on p.driver_id = a.driver_id
+    -> ;
+ERROR 1054 (42S22): Unknown column 'a.driver_id' in 'on clause'
+mysql> select count(distinct driver_id) from participated p
+    -> inner join accident a on p.report_number = a.report_number
+    -> and year(a.accd) = "1989";
+ERROR 1054 (42S22): Unknown column 'a.accd' in 'on clause'
+mysql> select count(distinct driver_id) from participated p
+    -> inner join accident a on p.report_number = a.report_number
+    -> and year(a.accd_date) = "1989";
++---------------------------+
+| count(distinct driver_id) |
++---------------------------+
+|                         3 |
++---------------------------+
+1 row in set (0.01 sec)
+
+mysql> select count(distinct driver_id) as Number_Of_Persons from participated p
+    -> inner join accident a on p.report_number = a.report_number
+    -> and year(a.accd_date) = "1989";
++-------------------+
+| Number_Of_Persons |
++-------------------+
+|                 3 |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> update person set name="Rahul" where name="driver100";
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+mysql> update person set name="Rahul" where name="Rajesh";
+Query OK, 1 row affected (0.03 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> select * from person;
++-----------+----------+-----------+
+| driver_id | name     | address   |
++-----------+----------+-----------+
+| Driver100 | Rahul    | Karkala   |
+| Driver101 | Shiva    | Bailuru   |
+| Driver102 | Akshay   | Hiriadka  |
+| Driver103 | Krishna  | Moodbidri |
+| Driver104 | Rajendra | Ajekar    |
++-----------+----------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> select * from car;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 1986 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+5 rows in set (0.00 sec)
+
+mysql> select * from accident;
++---------------+------------+-----------------+
+| report_number | accd_date  | location        |
++---------------+------------+-----------------+
+|          2001 | 1989-08-25 | Santhekatte     |
+|          2002 | 1989-07-24 | Laxminagar      |
+|          2003 | 1985-02-20 | Kalsanka        |
+|          2004 | 1984-05-13 | Karavali Bypass |
+|          2005 | 1989-06-30 | Malpe           |
++---------------+------------+-----------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from owns;
++-----------+------------+
+| driver_id | regno      |
++-----------+------------+
+| driver100 | KA20AF2445 |
+| driver101 | KA20EA2418 |
+| driver100 | KA20EA2545 |
+| driver104 | KA20EA2789 |
+| driver103 | KA20ED2489 |
++-----------+------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from participated;
++-----------+------------+---------------+---------------+
+| driver_id | regno      | report_number | damage_amount |
++-----------+------------+---------------+---------------+
+| driver100 | KA20AF2445 |          2001 |         47800 |
+| driver100 | KA20EA2545 |          2003 |         83000 |
+| driver101 | KA20EA2418 |          2002 |         47800 |
+| driver103 | KA20ED2489 |          2005 |         83000 |
++-----------+------------+---------------+---------------+
+4 rows in set (0.00 sec)
+
+mysql> insert into accident values("1", "2001-04-23","Katpadi");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into car values("KA-12-1", "Innova",1992);
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into owns values ("driver100","KA-12-1");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> insert into participated values("driver100", "KA-12-1",1,7000);
+Query OK, 1 row affected (0.02 sec)
+
+mysql> select * from person;
++-----------+----------+-----------+
+| driver_id | name     | address   |
++-----------+----------+-----------+
+| Driver100 | Rahul    | Karkala   |
+| Driver101 | Shiva    | Bailuru   |
+| Driver102 | Akshay   | Hiriadka  |
+| Driver103 | Krishna  | Moodbidri |
+| Driver104 | Rajendra | Ajekar    |
++-----------+----------+-----------+
+5 rows in set (0.00 sec)
+
+mysql> select * from car;
++------------+----------+------+
+| regno      | model    | year |
++------------+----------+------+
+| KA-12-1    | Innova   | 1992 |
+| KA20AF2445 | Scorpio  | 1984 |
+| KA20EA2418 | Mahindra | 1985 |
+| KA20EA2545 | Baleno   | 1986 |
+| KA20EA2789 | brezza   | 1985 |
+| KA20ED2489 | omni     | 1988 |
++------------+----------+------+
+6 rows in set (0.00 sec)
+
+mysql> select * from accident;
++---------------+------------+-----------------+
+| report_number | accd_date  | location        |
++---------------+------------+-----------------+
+|             1 | 2001-04-23 | Katpadi         |
+|          2001 | 1989-08-25 | Santhekatte     |
+|          2002 | 1989-07-24 | Laxminagar      |
+|          2003 | 1985-02-20 | Kalsanka        |
+|          2004 | 1984-05-13 | Karavali Bypass |
+|          2005 | 1989-06-30 | Malpe           |
++---------------+------------+-----------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from owns;
++-----------+------------+
+| driver_id | regno      |
++-----------+------------+
+| driver100 | KA-12-1    |
+| driver100 | KA20AF2445 |
+| driver101 | KA20EA2418 |
+| driver100 | KA20EA2545 |
+| driver104 | KA20EA2789 |
+| driver103 | KA20ED2489 |
++-----------+------------+
+6 rows in set (0.00 sec)
+
+mysql> select * from participated;
++-----------+------------+---------------+---------------+
+| driver_id | regno      | report_number | damage_amount |
++-----------+------------+---------------+---------------+
+| driver100 | KA-12-1    |             1 |          7000 |
+| driver100 | KA20AF2445 |          2001 |         47800 |
+| driver100 | KA20EA2545 |          2003 |         83000 |
+| driver101 | KA20EA2418 |          2002 |         47800 |
+| driver103 | KA20ED2489 |          2005 |         83000 |
++-----------+------------+---------------+---------------+
+5 rows in set (0.00 sec)
+
+mysql> select count(distinct driver_id) as Number_Of_Persons from participated p
+    -> inner join accident a on p.report_number = a.report_number
+    -> and year(a.accd_date) = "1989";
++-------------------+
+| Number_Of_Persons |
++-------------------+
+|                 3 |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> select count(driver_id) as Number_Of_Persons from participated p
+    -> inner join accident a on p.report_number = a.report_number
+    -> and year(a.accd_date) = "1989";
++-------------------+
+| Number_Of_Persons |
++-------------------+
+|                 3 |
++-------------------+
+1 row in set (0.02 sec)
+
+mysql> select count(report_number) from accident a
+    -> inner join participated p on a.report_id = p.report_id
+    -> inner join person ps on p.driver_id = ps.driver_id
+    -> and ps.driver_id = p.driver_id;
+ERROR 1052 (23000): Column 'report_number' in field list is ambiguous
+mysql> select count(report_number) from accident a
+    -> inner join participated p on a.report_number = p.report_number
+    -> inner join person ps on p.driver_id = ps.driver_id
+    -> and ps.driver_name = "RAHUL";
+ERROR 1052 (23000): Column 'report_number' in field list is ambiguous
+mysql> select count(a.report_number) from accident a
+    -> inner join participated p on a.report_number = p.report_number
+    -> inner join person ps on p.driver_id = ps.driver_id
+    -> and ps.driver_name = "RAHUL";
+ERROR 1054 (42S22): Unknown column 'ps.driver_name' in 'on clause'
+mysql> select count(a.report_number) from accident a
+    -> inner join participated p on a.report_number = p.report_number
+    -> inner join person ps on p.driver_id = ps.driver_id
+    -> and ps.name = "RAHUL";
++------------------------+
+| count(a.report_number) |
++------------------------+
+|                      3 |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> select count(a.report_number) from accident a
+    -> inner join participated p on a.report_number = p.report_number
+    -> inner join person ps on p.driver_id = ps.driver_id
+    -> and ps.name = "shiva";
++------------------------+
+| count(a.report_number) |
++------------------------+
+|                      1 |
++------------------------+
+1 row in set (0.00 sec)
+
+mysql> update participated set damage_amount = 3000
+    -> where regno = "KA-12-1" and report_number = 1;
+Query OK, 1 row affected (0.05 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql>
