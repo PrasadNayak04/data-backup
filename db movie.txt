@@ -1,0 +1,509 @@
+Enter password: ***********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 401
+Server version: 8.0.30 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database MovieTicket
+    -> ;
+Query OK, 1 row affected (1.10 sec)
+
+mysql> use MovieTicket;
+Database changed
+mysql> create table Admin(AdminEmail varchar(30), AdminPassword varchar(20));
+Query OK, 0 rows affected (0.85 sec)
+
+mysql> create table User(FirstName char(20), LastName char(20), Email varchar(30) primary key, PhoneNumber long);
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> create table Movie(MovieTitle varchar(20) primary key, Description varchar(30));
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> create table Theatre(TheatreName varchar(20), TheatreLocation varchar(20), NumberOfSeats int default = 100, primary key(TheatreName, TheatreLoation));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '= 100, primary key(TheatreName, TheatreLoation))' at line 1
+mysql> create table Theatre(TheatreName varchar(20), TheatreLocation varchar(20), NumberOfSeats int default 100, primary key(TheatreName, TheatreLoation));
+ERROR 1072 (42000): Key column 'TheatreLoation' doesn't exist in table
+mysql> create table Theatre(TheatreName varchar(20), TheatreLocation varchar(20), NumberOfSeats int default 100, primary key(TheatreName, TheatreLocation));
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> alter table theatre drop column numberofseats;
+Query OK, 0 rows affected (0.17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table Screen(ScreenId int unique, TheatreName varchar(20), Location varchar(20), Foreign Key(TheatreName, Location) references Theatre(TheatreName,TheatreLocation), Primary key(TheatreName, Location));
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> desc Screen;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| ScreenId    | int         | YES  | UNI | NULL    |       |
+| TheatreName | varchar(20) | NO   | PRI | NULL    |       |
+| Location    | varchar(20) | NO   | PRI | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+3 rows in set (0.10 sec)
+
+mysql> show create table Screen;
++--------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table  | Create Table                                                                                                                                                                                                                                                                                                                                                                                                    |
++--------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Screen | CREATE TABLE `screen` (
+  `ScreenId` int DEFAULT NULL,
+  `TheatreName` varchar(20) NOT NULL,
+  `Location` varchar(20) NOT NULL,
+  PRIMARY KEY (`TheatreName`,`Location`),
+  UNIQUE KEY `ScreenId` (`ScreenId`),
+  CONSTRAINT `screen_ibfk_1` FOREIGN KEY (`TheatreName`, `Location`) REFERENCES `theatre` (`TheatreName`, `TheatreLocation`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++--------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> desc Screen;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| ScreenId    | int         | YES  | UNI | NULL    |       |
+| TheatreName | varchar(20) | NO   | PRI | NULL    |       |
+| Location    | varchar(20) | NO   | PRI | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> alter table screen delete primary key;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'delete primary key' at line 1
+mysql> alter table screen delete primary key(TheatreName, Location);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'delete primary key(TheatreName, Location)' at line 1
+mysql> alter table screen drop primary key;
+ERROR 1553 (HY000): Cannot drop index 'PRIMARY': needed in a foreign key constraint
+mysql> alter table screen drop foreign key;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+mysql> drop table screen;
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> create table Screen(ScreenId int unique, TheatreName varchar(20), Location varchar(20), Foreign Key(TheatreName, Location) references Theatre(TheatreName,TheatreLocation), Primary key(ScreenId,TheatreName, Location));
+Query OK, 0 rows affected (0.24 sec)
+
+mysql> create table ShowDetails(ShowId int primary key, MovieName varchar(20), TheatreName varchar(20), ScreenId int, Location varchar(20), ShoeTime time, DateOfShow date, AvailableSeats int default 100, foreign key(TheatreName, ScreenId, Location) references Screen(TheatreName, ScreenId, Loacation));;
+ERROR 3734 (HY000): Failed to add the foreign key constraint. Missing column 'Loacation' for constraint 'showdetails_ibfk_1' in the referenced table 'screen'
+ERROR:
+No query specified
+
+mysql> create table ShowDetails(ShowId int primary key, MovieName varchar(20), TheatreName varchar(20), ScreenId int, Location varchar(20), ShoeTime time, DateOfShow date, AvailableSeats int default 100, foreign key(TheatreName, ScreenId, Location) references Screen(TheatreName, ScreenId, Location));;
+ERROR 1822 (HY000): Failed to add the foreign key constraint. Missing index for constraint 'showdetails_ibfk_1' in the referenced table 'screen'
+ERROR:
+No query specified
+
+mysql> desc screen;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| ScreenId    | int         | NO   | PRI | NULL    |       |
+| TheatreName | varchar(20) | NO   | PRI | NULL    |       |
+| Location    | varchar(20) | NO   | PRI | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> create table ShowDetails(ShowId int primary key, MovieName varchar(20), TheatreName varchar(20), ScreenId int, Location varchar(20), ShowTime time, DateOfShow date, AvailableSeats int default 100, foreign key(TheatreName, ScreenId, Location) references Screen(TheatreName, ScreenId, Location));
+ERROR 1822 (HY000): Failed to add the foreign key constraint. Missing index for constraint 'showdetails_ibfk_1' in the referenced table 'screen'
+mysql> create table ShowDetails(ShowId int primary key, MovieName varchar(20), TheatreName varchar(20), ScreenId int, Location varchar(20), ShowTime time, DateOfShow date, AvailableSeats int default 100, foreign key(ScreenId, TheatreName, Location) references Screen(ScreenId, TheatreName, Location));
+Query OK, 0 rows affected (0.59 sec)
+
+mysql> alter table showdetails add foreign key(movieName) references movie(movieName);
+ERROR 3734 (HY000): Failed to add the foreign key constraint. Missing column 'movieName' for constraint 'showdetails_ibfk_2' in the referenced table 'movie'
+mysql> alter table showdetails add foreign key(movieName) references movie(movieTitle);
+Query OK, 0 rows affected (0.37 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> Create Table Bookings(BookingId int auto_increment primary key, UserEmail varchar(30), MovieName varchar(20), ShowId int, NumberOfTicket int, TheatreName varchar(20), ScreenId int, Location varchar(20), foreign key(UserEmail) references User(UserEmail), foreign key(ShowId) references ShowDetails(ShowId));
+ERROR 3734 (HY000): Failed to add the foreign key constraint. Missing column 'UserEmail' for constraint 'bookings_ibfk_1' in the referenced table 'user'
+mysql> desc user;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| FirstName   | char(20)    | YES  |     | NULL    |       |
+| LastName    | char(20)    | YES  |     | NULL    |       |
+| Email       | varchar(30) | NO   | PRI | NULL    |       |
+| PhoneNumber | mediumtext  | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> Create Table Bookings(BookingId int auto_increment primary key, UserEmail varchar(30), MovieName varchar(20), ShowId int, NumberOfTicket int, TheatreName varchar(20), ScreenId int, Location varchar(20), foreign key(UserEmail) references User(Email), foreign key(ShowId) references ShowDetails(ShowId));
+Query OK, 0 rows affected (0.73 sec)
+
+mysql> desc bookings;
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| BookingId      | int         | NO   | PRI | NULL    | auto_increment |
+| UserEmail      | varchar(30) | YES  | MUL | NULL    |                |
+| MovieName      | varchar(20) | YES  |     | NULL    |                |
+| ShowId         | int         | YES  | MUL | NULL    |                |
+| NumberOfTicket | int         | YES  |     | NULL    |                |
+| TheatreName    | varchar(20) | YES  |     | NULL    |                |
+| ScreenId       | int         | YES  |     | NULL    |                |
+| Location       | varchar(20) | YES  |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> insert into user values("Prasad", " Nayak","prasadhdk9@gmail.com",9611863241);
+Query OK, 1 row affected (0.11 sec)
+
+mysql> desc movie
+    -> ;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| MovieTitle  | varchar(20) | NO   | PRI | NULL    |       |
+| Description | varchar(30) | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+2 rows in set (0.02 sec)
+
+mysql> insert into movie values("Ugram", "Sensational");
+Query OK, 1 row affected (0.05 sec)
+
+mysql> desc theatres;
+ERROR 1146 (42S02): Table 'movieticket.theatres' doesn't exist
+mysql> desc theatre;
++-----------------+-------------+------+-----+---------+-------+
+| Field           | Type        | Null | Key | Default | Extra |
++-----------------+-------------+------+-----+---------+-------+
+| TheatreName     | varchar(20) | NO   | PRI | NULL    |       |
+| TheatreLocation | varchar(20) | NO   | PRI | NULL    |       |
++-----------------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> insert into Theatre values("Kalpana", "Kinnimulki");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> insert into screen values(2,"Kalpana","Udupi");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`movieticket`.`screen`, CONSTRAINT `screen_ibfk_1` FOREIGN KEY (`TheatreName`, `Location`) REFERENCES `theatre` (`TheatreName`, `TheatreLocation`))
+mysql> insert into screen values(2,"Kalpana","Kinnimulki");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> in
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'in' at line 1
+mysql> desc showdetails;
++----------------+-------------+------+-----+---------+-------+
+| Field          | Type        | Null | Key | Default | Extra |
++----------------+-------------+------+-----+---------+-------+
+| ShowId         | int         | NO   | PRI | NULL    |       |
+| MovieName      | varchar(20) | YES  | MUL | NULL    |       |
+| TheatreName    | varchar(20) | YES  |     | NULL    |       |
+| ScreenId       | int         | YES  | MUL | NULL    |       |
+| Location       | varchar(20) | YES  |     | NULL    |       |
+| ShowTime       | time        | YES  |     | NULL    |       |
+| DateOfShow     | date        | YES  |     | NULL    |       |
+| AvailableSeats | int         | YES  |     | 100     |       |
++----------------+-------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+
+mysql> insert into showdetails values(23, "Ugram", "Kalpana", 2, "Kinnimulki", "09:00:00","2022-09-27");
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> insert into showdetails (show_id,moviename,theatrename,screenId,location,showtime,dateofshow)values(23, "Ugram", "Kalpana", 2, "Kinnimulki", "09:00:00","2022-09-27");
+ERROR 1054 (42S22): Unknown column 'show_id' in 'field list'
+mysql> insert into showdetails (showid,moviename,theatrename,screenId,location,showtime,dateofshow)values(23, "Ugram", "Kalpana", 2, "Kinnimulki", "09:00:00","2022-09-27");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> desc bookings;
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| BookingId      | int         | NO   | PRI | NULL    | auto_increment |
+| UserEmail      | varchar(30) | YES  | MUL | NULL    |                |
+| MovieName      | varchar(20) | YES  |     | NULL    |                |
+| ShowId         | int         | YES  | MUL | NULL    |                |
+| NumberOfTicket | int         | YES  |     | NULL    |                |
+| TheatreName    | varchar(20) | YES  |     | NULL    |                |
+| ScreenId       | int         | YES  |     | NULL    |                |
+| Location       | varchar(20) | YES  |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> insert into bookings (UserEmail,moviename,showid,numberofticket,theatrename,screenId,location,showtime)values(23, "Ugram", "Kalpana", 2, "Kinnimulki", "09:00:00","2022-09-27");
+ERROR 1054 (42S22): Unknown column 'showtime' in 'field list'
+mysql> insert into bookings (UserEmail,moviename,showid,numberofticket,theatrename,screenId,location)values("prasadhdk9@gmail.com","Ugram", 23,3, "Kalpana", 2, "Kinnimulki");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from bookings;
++-----------+----------------------+-----------+--------+----------------+-------------+----------+------------+
+| BookingId | UserEmail            | MovieName | ShowId | NumberOfTicket | TheatreName | ScreenId | Location   |
++-----------+----------------------+-----------+--------+----------------+-------------+----------+------------+
+|         1 | prasadhdk9@gmail.com | Ugram     |     23 |              3 | Kalpana     |        2 | Kinnimulki |
++-----------+----------------------+-----------+--------+----------------+-------------+----------+------------+
+1 row in set (0.00 sec)
+
+mysql> insert into bookings (UserEmail,moviename,showid,numberofticket,theatrename,screenId,location)values("prasadhdk9@gmail.co","Ugram", 23,3, "Kalpana", 2, "Kinnimulki");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`movieticket`.`bookings`, CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`UserEmail`) REFERENCES `user` (`Email`))
+mysql> insert into bookings (UserEmail,moviename,showid,numberofticket,theatrename,screenId,location)values("prasadhdk9@gmail.com","Ugram", 23,3, "Kalpana", 2, "Kinnimulki");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from bookings;
++-----------+----------------------+-----------+--------+----------------+-------------+----------+------------+
+| BookingId | UserEmail            | MovieName | ShowId | NumberOfTicket | TheatreName | ScreenId | Location   |
++-----------+----------------------+-----------+--------+----------------+-------------+----------+------------+
+|         1 | prasadhdk9@gmail.com | Ugram     |     23 |              3 | Kalpana     |        2 | Kinnimulki |
+|         3 | prasadhdk9@gmail.com | Ugram     |     23 |              3 | Kalpana     |        2 | Kinnimulki |
++-----------+----------------------+-----------+--------+----------------+-------------+----------+------------+
+2 rows in set (0.00 sec)
+
+mysql> insert into bookings (UserEmail,moviename,showid,numberofticket,theatrename,screenId,location)values("prasadhdk9@gmail.com","Ugram", 23,3, "Kalpana", 2, "Kinnimulki");
+Query OK, 1 row affected (0.02 sec)
+
+mysql> alter table bookings add column ShowTime time;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc bookings;
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| BookingId      | int         | NO   | PRI | NULL    | auto_increment |
+| UserEmail      | varchar(30) | YES  | MUL | NULL    |                |
+| MovieName      | varchar(20) | YES  |     | NULL    |                |
+| ShowId         | int         | YES  | MUL | NULL    |                |
+| NumberOfTicket | int         | YES  |     | NULL    |                |
+| TheatreName    | varchar(20) | YES  |     | NULL    |                |
+| ScreenId       | int         | YES  |     | NULL    |                |
+| Location       | varchar(20) | YES  |     | NULL    |                |
+| ShowTime       | time        | YES  |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+9 rows in set (0.00 sec)
+
+mysql> alter table bookings add column DateOfShow date;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> insert into bookings (UserEmail,moviename,showid,numberofticket,theatrename,screenId,location)values("prasadhdk9@gmail.com","Ugram2", 23,3, "Kalpana", 2, "Kinnimulki");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> desc showdetails;
++----------------+-------------+------+-----+---------+-------+
+| Field          | Type        | Null | Key | Default | Extra |
++----------------+-------------+------+-----+---------+-------+
+| ShowId         | int         | NO   | PRI | NULL    |       |
+| MovieName      | varchar(20) | YES  | MUL | NULL    |       |
+| TheatreName    | varchar(20) | YES  |     | NULL    |       |
+| ScreenId       | int         | YES  | MUL | NULL    |       |
+| Location       | varchar(20) | YES  |     | NULL    |       |
+| ShowTime       | time        | YES  |     | NULL    |       |
+| DateOfShow     | date        | YES  |     | NULL    |       |
+| AvailableSeats | int         | YES  |     | 100     |       |
++----------------+-------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+
+mysql> insert into showdetails (showid,moviename,theatrename,screenId,location,showtime,dateofshow)values(23, "Ugram2", "Kalpana", 2, "Kinnimulki", "09:00:00","2022-09-27");
+ERROR 1062 (23000): Duplicate entry '23' for key 'showdetails.PRIMARY'
+mysql> insert into showdetails (showid,moviename,theatrename,screenId,location,showtime,dateofshow)values(24, "Ugram2", "Kalpana", 2, "Kinnimulki", "09:00:00","2022-09-27");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`movieticket`.`showdetails`, CONSTRAINT `showdetails_ibfk_2` FOREIGN KEY (`MovieName`) REFERENCES `movie` (`MovieTitle`))
+mysql> desc bookings;
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| BookingId      | int         | NO   | PRI | NULL    | auto_increment |
+| UserEmail      | varchar(30) | YES  | MUL | NULL    |                |
+| MovieName      | varchar(20) | YES  |     | NULL    |                |
+| ShowId         | int         | YES  | MUL | NULL    |                |
+| NumberOfTicket | int         | YES  |     | NULL    |                |
+| TheatreName    | varchar(20) | YES  |     | NULL    |                |
+| ScreenId       | int         | YES  |     | NULL    |                |
+| Location       | varchar(20) | YES  |     | NULL    |                |
+| ShowTime       | time        | YES  |     | NULL    |                |
+| DateOfShow     | date        | YES  |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+10 rows in set (0.00 sec)
+
+mysql> alter table drop column moviename;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'drop column moviename' at line 1
+mysql> alter table bookings drop column moviename;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table bookings drop column theatrename;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table bookings drop column screenid;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table bookings drop column location;
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table bookings drop column showtime;
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table bookings drop column dateofshow;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from bookings;
++-----------+----------------------+--------+----------------+
+| BookingId | UserEmail            | ShowId | NumberOfTicket |
++-----------+----------------------+--------+----------------+
+|         1 | prasadhdk9@gmail.com |     23 |              3 |
+|         3 | prasadhdk9@gmail.com |     23 |              3 |
+|         4 | prasadhdk9@gmail.com |     23 |              3 |
+|         5 | prasadhdk9@gmail.com |     23 |              3 |
++-----------+----------------------+--------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> desc admin;
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| AdminEmail    | varchar(30) | YES  |     | NULL    |       |
+| AdminPassword | varchar(20) | YES  |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc user;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| FirstName   | char(20)    | YES  |     | NULL    |       |
+| LastName    | char(20)    | YES  |     | NULL    |       |
+| Email       | varchar(30) | NO   | PRI | NULL    |       |
+| PhoneNumber | mediumtext  | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc theatre;
++-----------------+-------------+------+-----+---------+-------+
+| Field           | Type        | Null | Key | Default | Extra |
++-----------------+-------------+------+-----+---------+-------+
+| TheatreName     | varchar(20) | NO   | PRI | NULL    |       |
+| TheatreLocation | varchar(20) | NO   | PRI | NULL    |       |
++-----------------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc movies;
+ERROR 1146 (42S02): Table 'movieticket.movies' doesn't exist
+mysql> desc movie;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| MovieTitle  | varchar(20) | NO   | PRI | NULL    |       |
+| Description | varchar(30) | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+mysql> desc screen;;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| ScreenId    | int         | NO   | PRI | NULL    |       |
+| TheatreName | varchar(20) | NO   | PRI | NULL    |       |
+| Location    | varchar(20) | NO   | PRI | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+ERROR:
+No query specified
+
+mysql> desc show;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'show' at line 1
+mysql> desc showdetails;
++----------------+-------------+------+-----+---------+-------+
+| Field          | Type        | Null | Key | Default | Extra |
++----------------+-------------+------+-----+---------+-------+
+| ShowId         | int         | NO   | PRI | NULL    |       |
+| MovieName      | varchar(20) | YES  | MUL | NULL    |       |
+| TheatreName    | varchar(20) | YES  |     | NULL    |       |
+| ScreenId       | int         | YES  | MUL | NULL    |       |
+| Location       | varchar(20) | YES  |     | NULL    |       |
+| ShowTime       | time        | YES  |     | NULL    |       |
+| DateOfShow     | date        | YES  |     | NULL    |       |
+| AvailableSeats | int         | YES  |     | 100     |       |
++----------------+-------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+
+mysql> desc bookings;
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| BookingId      | int         | NO   | PRI | NULL    | auto_increment |
+| UserEmail      | varchar(30) | YES  | MUL | NULL    |                |
+| ShowId         | int         | YES  | MUL | NULL    |                |
+| NumberOfTicket | int         | YES  |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from user;
++-----------+----------+----------------------+-------------+
+| FirstName | LastName | Email                | PhoneNumber |
++-----------+----------+----------------------+-------------+
+| Prasad    |  Nayak   | prasadhdk9@gmail.com | 9611863241  |
++-----------+----------+----------------------+-------------+
+1 row in set (0.00 sec)
+
+mysql> select * from movies;
+ERROR 1146 (42S02): Table 'movieticket.movies' doesn't exist
+mysql> select * from movie;
++------------+-------------+
+| MovieTitle | Description |
++------------+-------------+
+| Ugram      | Sensational |
++------------+-------------+
+1 row in set (0.00 sec)
+
+mysql> select * from theatre;
++-------------+-----------------+
+| TheatreName | TheatreLocation |
++-------------+-----------------+
+| Kalpana     | Kinnimulki      |
++-------------+-----------------+
+1 row in set (0.00 sec)
+
+mysql> select * from screen;
++----------+-------------+------------+
+| ScreenId | TheatreName | Location   |
++----------+-------------+------------+
+|        2 | Kalpana     | Kinnimulki |
++----------+-------------+------------+
+1 row in set (0.00 sec)
+
+mysql> select * from showdetails;
++--------+-----------+-------------+----------+------------+----------+------------+----------------+
+| ShowId | MovieName | TheatreName | ScreenId | Location   | ShowTime | DateOfShow | AvailableSeats |
++--------+-----------+-------------+----------+------------+----------+------------+----------------+
+|     23 | Ugram     | Kalpana     |        2 | Kinnimulki | 09:00:00 | 2022-09-27 |            100 |
++--------+-----------+-------------+----------+------------+----------+------------+----------------+
+1 row in set (0.00 sec)
+
+mysql> select * from bookings;
++-----------+----------------------+--------+----------------+
+| BookingId | UserEmail            | ShowId | NumberOfTicket |
++-----------+----------------------+--------+----------------+
+|         1 | prasadhdk9@gmail.com |     23 |              3 |
+|         3 | prasadhdk9@gmail.com |     23 |              3 |
+|         4 | prasadhdk9@gmail.com |     23 |              3 |
+|         5 | prasadhdk9@gmail.com |     23 |              3 |
++-----------+----------------------+--------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> alter table movies add column ShowTimeDuration time;
+ERROR 1146 (42S02): Table 'movieticket.movies' doesn't exist
+mysql> alter table movie add column ShowTimeDuration time;
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from user;
++-----------+----------+----------------------+-------------+
+| FirstName | LastName | Email                | PhoneNumber |
++-----------+----------+----------------------+-------------+
+| Prasad    |  Nayak   | prasadhdk9@gmail.com | 9611863241  |
+| Rohit     | Kumar    | rohitkumar@gmail.com | 7647872364  |
++-----------+----------+----------------------+-------------+
+2 rows in set (0.00 sec)
+
+mysql>
+mysql>

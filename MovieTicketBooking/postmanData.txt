@@ -1,0 +1,7 @@
+user register___
+    {
+        "firstName" : "Rohit",
+        "lastName" : "Kumar",
+        "email" : "rohitkumar@gmail.com",
+        "phoneNumber" : "7647872364"
+    }
