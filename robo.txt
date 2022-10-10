@@ -4,4 +4,7 @@
 4. Spring and SpringBoot AOP
 5. Holiday
 6. JPA 1 to one, ....... many to many
-7. 1NF, 2NF, 3NF,
+7. 1NF, 2NF, 3NF
+8. holiday
+9. holiday
+10. Full stack
