@@ -7,6 +7,12 @@ import com.robosoft.HospitalManagementJdbc.model.Ward;
 public interface HospitalServices {
 
     public String addDepartment(Department department);
+
     public String addDoctorToDepartment(Doctor doctor);
+
     public String addWard(Ward ward);
+
+    public boolean isAvailable(Doctor doctor);
+
+    public boolean isVacant(Ward ward);
 }

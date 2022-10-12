@@ -1,6 +1,8 @@
 package com.robosoft.HospitalManagementJdbc.controller;
 
+import com.robosoft.HospitalManagementJdbc.model.Admission;
 import com.robosoft.HospitalManagementJdbc.model.AdmissionPatient;
+import com.robosoft.HospitalManagementJdbc.model.Appointment;
 import com.robosoft.HospitalManagementJdbc.model.OpdPatient;
 import com.robosoft.HospitalManagementJdbc.service.HelpdeskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,16 @@ public class HelpdeskController {
     @PostMapping("/admission")
     public int registerAdmissionPatient(@RequestBody AdmissionPatient admissionPatient){
         return helpdeskService.registerAdmissionPatient(admissionPatient);
+    }
+
+    @PostMapping("/appointment")
+    public String bookAppointment(@RequestBody Appointment appointment){
+        return helpdeskService.bookAppointment(appointment);
+    }
+
+    @PostMapping("/admission")
+    public String admitPatient(@RequestBody Admission admission){
+        return helpdeskService.admitPatient(admission);
     }
 
 

@@ -4,6 +4,6 @@ import com.robosoft.HospitalManagementJdbc.model.Doctor;
 
 public interface DoctorServices {
 
-    public boolean isAvailable(Doctor doctor);
+
 
 }
