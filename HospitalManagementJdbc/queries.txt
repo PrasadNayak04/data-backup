@@ -1,0 +1,254 @@
+mysql> create table Doctor(Doctor_Id int auto_increment unique, Doctor_Name varchar(20), Department_Name varchar(20), foreign key(Department_Name) references Department(Department_Name) on delete cascade, primary key(Doctor_Id, Department_Name));
+Query OK, 0 rows affected (0.19 sec)
+
+mysql> alter table Doctor auto_increment = 700;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table Ward(Ward_Name varchar(20), Department_Name varchar(20), Doctor_Id int, Capacity int, foreign key(Doctor_Id, Department_Name) references Doctor(Doctor_Id, Department_Name) on delete cascade, primary key(Ward_Name, Department_Name));
+Query OK, 0 rows affected (0.14 sec)
+
+mysql> insert into department values("Card");
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> insert into department (Department_Name) values("Card");
+Query OK, 1 row affected (0.08 sec)
+
+mysql> select * from department;
++----------------+-----------------+
+| Department__Id | Department_Name |
++----------------+-----------------+
+|            500 | Card            |
++----------------+-----------------+
+1 row in set (0.02 sec)
+
+mysql> insert into department (Department_Name) values("Cardio");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from department;
++----------------+-----------------+
+| Department__Id | Department_Name |
++----------------+-----------------+
+|            500 | Card            |
+|            501 | Cardio          |
++----------------+-----------------+
+2 rows in set (0.00 sec)
+
+mysql> insert into Doctor (Doctor_Name, Department_Name) values ("Ram", "Ca");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`hospitalmanagement`.`doctor`, CONSTRAINT `doctor_ibfk_1` FOREIGN KEY (`Department_Name`) REFERENCES `department` (`Department_Name`) ON DELETE CASCADE)
+mysql> insert into Doctor (Doctor_Name, Department_Name) values ("Ram", "Card");
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from doctor;
++-----------+-------------+-----------------+
+| Doctor_Id | Doctor_Name | Department_Name |
++-----------+-------------+-----------------+
+|       701 | Ram         | Card            |
++-----------+-------------+-----------------+
+1 row in set (0.00 sec)
+
+mysql> delete from department;
+Query OK, 2 rows affected (0.03 sec)
+
+mysql> select * from doctor;
+Empty set (0.00 sec)
+
+mysql> create table Patient(Patient_Id int, Patient_Name varchar(20), Age int, Gender Enum("Male", "Female", "Other"), Phone_No long, Patient_Type Enum("OPD", "ADMISSION"), Admission_Days int default = 0);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '= 0)' at line 1
+mysql> create table Patient(Patient_Id int, Patient_Name varchar(20), Age int, Gender Enum("Male", "Female", "Other"), Phone_No long, Patient_Type Enum("OPD", "ADMISSION"), Admission_Days int default 0);
+Query OK, 0 rows affected (0.13 sec)
+
+mysql> drop table patient;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> create table Patient(Patient_Id long auto_increment primary key, Patient_Name varchar(20), Age int, Gender Enum("Male", "Female", "Other"), Phone_No long, Patient_Type Enum("OPD", "ADMISSION"), Admission_Days int default 0);
+ERROR 1063 (42000): Incorrect column specifier for column 'Patient_Id'
+mysql> create table Patient(Patient_Id long primary key auto_increment, Patient_Name varchar(20), Age int, Gender Enum("Male", "Female", "Other"), Phone_No long, Patient_Type Enum("OPD", "ADMISSION"), Admission_Days int default 0);
+ERROR 1063 (42000): Incorrect column specifier for column 'Patient_Id'
+mysql> create table Patient(Patient_Id long primary key identity(1,1), Patient_Name varchar(20), Age int, Gender Enum("Male", "Female", "Other"), Phone_No long, Patient_Type Enum("OPD", "ADMISSION"), Admission_Days int default 0);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'identity(1,1), Patient_Name varchar(20), Age int, Gender Enum("Male", "Female", ' at line 1
+mysql> create table Patient(Patient_Id int auto_increment primary key, Patient_Name varchar(20), Age int, Gender Enum("Male", "Female", "Other"), Phone_No long, Patient_Type Enum("OPD", "ADMISSION"), Admission_Days int default 0);
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> desc patient
+    -> ;
++----------------+-------------------------------+------+-----+---------+----------------+
+| Field          | Type                          | Null | Key | Default | Extra          |
++----------------+-------------------------------+------+-----+---------+----------------+
+| Patient_Id     | int                           | NO   | PRI | NULL    | auto_increment |
+| Patient_Name   | varchar(20)                   | YES  |     | NULL    |                |
+| Age            | int                           | YES  |     | NULL    |                |
+| Gender         | enum('Male','Female','Other') | YES  |     | NULL    |                |
+| Phone_No       | mediumtext                    | YES  |     | NULL    |                |
+| Patient_Type   | enum('OPD','ADMISSION')       | YES  |     | NULL    |                |
+| Admission_Days | int                           | YES  |     | 0       |                |
++----------------+-------------------------------+------+-----+---------+----------------+
+7 rows in set (0.14 sec)
+
+mysql> desc department;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Department__Id  | int         | NO   | UNI | NULL    | auto_increment |
+| Department_Name | varchar(20) | NO   | PRI | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> alter table department rename column department__Id to Department_Id;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc department;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Department_Id   | int         | NO   | UNI | NULL    | auto_increment |
+| Department_Name | varchar(20) | NO   | PRI | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> desc doctor;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Doctor_Id       | int         | NO   | PRI | NULL    | auto_increment |
+| Doctor_Name     | varchar(20) | YES  |     | NULL    |                |
+| Department_Name | varchar(20) | NO   | PRI | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> create table Appointments(Appointment_Id int primary key auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Id int, foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Id, Department_Name) references Doctor(Doctor_Id, Department_Name) on delete cascade,
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1
+mysql> create table Appointments(Appointment_Id int primary key auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Id int, foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Id, Department_Name) references Doctor(Doctor_Id, Department_Name) on delete cascade);
+Query OK, 0 rows affected (0.80 sec)
+
+mysql> alter table Appointments modify Patient_Id int unique;
+Query OK, 0 rows affected (0.17 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table Admissions(Admission_Id int primary key, Patient_Id int unique, Ward_Name varchar(20), Department_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key (Ward_Name, Department_Name) references Ward(Ward_Name, Department_Name) on delete cascade);
+Query OK, 0 rows affected (0.20 sec)
+
+mysql> desc Admissions;
++-----------------+-------------+------+-----+---------+-------+
+| Field           | Type        | Null | Key | Default | Extra |
++-----------------+-------------+------+-----+---------+-------+
+| Admission_Id    | int         | NO   | PRI | NULL    |       |
+| Patient_Id      | int         | YES  | UNI | NULL    |       |
+| Ward_Name       | varchar(20) | YES  | MUL | NULL    |       |
+| Department_Name | varchar(20) | YES  |     | NULL    |       |
++-----------------+-------------+------+-----+---------+-------+
+4 rows in set (0.08 sec)
+
+mysql> alter table Admissions modify Admission_Id int auto_increment = 2000;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '= 2000' at line 1
+mysql> alter table Admissions modify Admission_Id int auto_increment;
+Query OK, 0 rows affected (0.49 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table Admissions modify Admission_Id int auto_increment = 2000;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '= 2000' at line 1
+mysql> alter table Admissions modify auto_increment = 2000;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '= 2000' at line 1
+mysql> alter table Admissions Alter auto_increment = 2000;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '= 2000' at line 1
+mysql> alter table Admissions auto_increment = 2000;
+Query OK, 0 rows affected (0.01 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc appointment;
+ERROR 1146 (42S02): Table 'hospitalmanagement.appointment' doesn't exist
+mysql> desc appointments;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Appointment_Id  | int         | NO   | PRI | NULL    | auto_increment |
+| Patient_Id      | int         | YES  | UNI | NULL    |                |
+| Department_Name | varchar(20) | YES  |     | NULL    |                |
+| Doctor_Id       | int         | YES  | MUL | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.02 sec)
+
+mysql> select * from Patient;
++------------+--------------+------+--------+------------+--------------+----------------+
+| Patient_Id | Patient_Name | Age  | Gender | Phone_No   | Patient_Type | Admission_Days |
++------------+--------------+------+--------+------------+--------------+----------------+
+|          1 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          2 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          3 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
++------------+--------------+------+--------+------------+--------------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> select * from Patient;
++------------+--------------+------+--------+------------+--------------+----------------+
+| Patient_Id | Patient_Name | Age  | Gender | Phone_No   | Patient_Type | Admission_Days |
++------------+--------------+------+--------+------------+--------------+----------------+
+|          1 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          2 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          3 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          4 | New Guy      |   41 | Male   | 9897797756 | OPD          |              0 |
+|          5 | New Guy      |   41 | Male   | 9897797756 | OPD          |              0 |
++------------+--------------+------+--------+------------+--------------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from Patient;
++------------+--------------+------+--------+------------+--------------+----------------+
+| Patient_Id | Patient_Name | Age  | Gender | Phone_No   | Patient_Type | Admission_Days |
++------------+--------------+------+--------+------------+--------------+----------------+
+|          1 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          2 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          3 | NULL         |   41 | Male   | 9897797756 | OPD          |              0 |
+|          4 | New Guy      |   41 | Male   | 9897797756 | OPD          |              0 |
+|          5 | New Guy      |   41 | Male   | 9897797756 | OPD          |              0 |
+|          6 | New Guy      |   41 | Male   | 9897797756 | ADMISSION    |              3 |
++------------+--------------+------+--------+------------+--------------+----------------+
+6 rows in set (0.00 sec)
+
+mysql> desc appointments;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Appointment_Id  | int         | NO   | PRI | NULL    | auto_increment |
+| Patient_Id      | int         | YES  | UNI | NULL    |                |
+| Department_Name | varchar(20) | YES  |     | NULL    |                |
+| Doctor_Id       | int         | YES  | MUL | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> drop table Admissions;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> drop table Appointments;
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> drop table Ward;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> drop table Doctor;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> create table Doctor(Doctor_Id int auto_increment unique, Doctor_Name varchar(20), Department_Name varchar(20), foreign key(Department_Name) references Department(Department_Name) on delete cascade, primary key(Doctor_Name, Department_Name));
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> create table Ward(Ward_Name varchar(20), Department_Name varchar(20), Doctor_Name varchar(20), Capacity int, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade, primary key(Ward_Name, Department_Name));
+Query OK, 0 rows affected (0.19 sec)
+
+mysql> create table Appointments(Appointment_Id int primary key auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade);
+Query OK, 0 rows affected (0.19 sec)
+
+mysql> create table Admissions(Admission_Id int primary key, Patient_Id int unique, Ward_Name varchar(20), Department_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key (Ward_Name, Department_Name) references Ward(Ward_Name, Department_Name) on delete cascade);
+Query OK, 0 rows affected (0.44 sec)
+
+mysql> alter table Doctor auto_increment = 700;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table Admissions auto_increment = 2000;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table Appointments auto_increment = 1000;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
