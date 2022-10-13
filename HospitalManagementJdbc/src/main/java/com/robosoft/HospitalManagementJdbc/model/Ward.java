@@ -11,7 +11,7 @@ public class Ward {
 
     private String wardName;
     private String departmentName;
-    private int doctorId;
+    private int doctorName;
     private int capacity;
 
 }

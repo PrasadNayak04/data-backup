@@ -8,4 +8,10 @@ public class Helpdesk {
 
     private int helpdeskId;
 
+    private String hospitalName;
+
+    public Helpdesk(String hospitalName) {
+        this.hospitalName = hospitalName;
+    }
+
 }

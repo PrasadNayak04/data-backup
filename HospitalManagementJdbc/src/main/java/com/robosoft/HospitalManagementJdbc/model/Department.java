@@ -10,8 +10,11 @@ public class Department {
     private int departmentId;
     private String departmentName;
 
-    public Department(String departmentName) {
+    private String hospitalName;
+
+    public Department(String departmentName, String hospitalName) {
         this.departmentName = departmentName;
+        this.hospitalName = hospitalName;
     }
 
 }

@@ -13,7 +13,7 @@ public class Hospital {
 
     public Hospital(String hospitalName) {
         this.hospitalName = hospitalName;
-        this.helpdesk = new Helpdesk();
+        this.helpdesk = new Helpdesk(this.hospitalName);
     }
 
 }
