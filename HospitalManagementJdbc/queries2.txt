@@ -1,0 +1,373 @@
+Enter password: ***********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 109
+Server version: 8.0.30 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use HospitalManagement;
+Database changed
+mysql> desc appointments;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Appointment_Id  | int         | NO   | PRI | NULL    | auto_increment |
+| Patient_Id      | int         | YES  | MUL | NULL    |                |
+| Department_Name | varchar(20) | YES  |     | NULL    |                |
+| Doctor_Name     | varchar(20) | YES  | MUL | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.25 sec)
+
+mysql> drop table appointments;
+Query OK, 0 rows affected (0.48 sec)
+
+mysql> create table Appointments(Appointment_Id int unique auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade, primary key(Patient_Id, Department_Name, DoctorName));
+ERROR 1072 (42000): Key column 'DoctorName' doesn't exist in table
+mysql> create table Appointments(Appointment_Id int unique auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade, primary key(Patient_Id, Department_Name, Doctor_Name));
+Query OK, 0 rows affected (0.72 sec)
+
+mysql> alter table Appointments auto_increment = 1000;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table appointments;
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> create table Appointments(Appointment_Id int primary key auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade);
+Query OK, 0 rows affected (0.48 sec)
+
+mysql> alter table Appointments auto_increment = 1000;
+Query OK, 0 rows affected (0.11 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table appointments;
+Query OK, 0 rows affected (0.05 sec)
+
+mysql> create table Appointments(Appointment_Id int unique auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade, primary key(Patient_Id, Department_Name, DoctorName));
+ERROR 1072 (42000): Key column 'DoctorName' doesn't exist in table
+mysql> create table Appointments(Appointment_Id int unique auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade, primary key(Patient_Id, Department_Name, Doctor_Name));
+Query OK, 0 rows affected (0.18 sec)
+
+mysql> create table AppointmentsHistory(Appointment_Id int unique auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade, primary key(Patient_Id, Department_Name, Doctor_Name));
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> alter table AppointmentsHistory auto_increment = 1000;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table AdmissionsHistory(Admission_Id int primary key, Patient_Id int unique, Ward_Name varchar(20), Department_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key (Ward_Name, Department_Name) references Ward(Ward_Name, Department_Name) on delete cascade);
+Query OK, 0 rows affected (0.30 sec)
+
+mysql> alter table Doctor auto_increment = 700;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table Admissions auto_increment = 2000;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table AdmissionsHistory auto_increment = 2000;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>  create table OpdMedicalRecord(Record_Id int primary key auto_incremment, Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), Date_Visited date, foreign key(patient_id, department_name, doctor_name) refeneces AppointmentsHistory(patient_id, department_name, doctor_name));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'auto_incremment, Patient_Id int, Department_Name varchar(20), Doctor_Name varcha' at line 1
+mysql>  create table OpdMedicalRecord(Record_Id int primary key auto_increment, Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), Date_Visited date, foreign key(patient_id, department_name, doctor_name) refeneces AppointmentsHistory(patient_id, department_name, doctor_name));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'refeneces AppointmentsHistory(patient_id, department_name, doctor_name))' at line 1
+mysql>  create table OpdMedicalRecord(Record_Id int primary key auto_increment, Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), Date_Visited date, foreign key(patient_id, department_name, doctor_name) references AppointmentsHistory(patient_id, department_name, doctor_name));
+Query OK, 0 rows affected (0.22 sec)
+
+mysql> desc OPdmedicalrecord
+    -> ;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Record_Id       | int         | NO   | PRI | NULL    | auto_increment |
+| Patient_Id      | int         | YES  | MUL | NULL    |                |
+| Department_Name | varchar(20) | YES  |     | NULL    |                |
+| Doctor_Name     | varchar(20) | YES  |     | NULL    |                |
+| Date_Visited    | date        | YES  |     | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from department;
+Empty set (0.00 sec)
+
+mysql> desc department;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Department_Id   | int         | NO   | UNI | NULL    | auto_increment |
+| Department_Name | varchar(20) | NO   | PRI | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+2 rows in set (0.00 sec)
+
+mysql> show tables;
++------------------------------+
+| Tables_in_hospitalmanagement |
++------------------------------+
+| admissions                   |
+| admissionshistory            |
+| appointments                 |
+| appointmentshistory          |
+| department                   |
+| doctor                       |
+| helpdesk                     |
+| opdmedicalrecord             |
+| patient                      |
+| ward                         |
++------------------------------+
+10 rows in set (0.04 sec)
+
+mysql>  create table AdmissionMedicalRecord(Record_Id int auto_incremenet primary key, Patient_Id int, Department_Name varchar(20), Admitted_Date date, foreign key(Patient_Id, Department_Name) references AdmissionHistory(Patient_Id, Department_Name));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'auto_incremenet primary key, Patient_Id int, Department_Name varchar(20), Admitt' at line 1
+mysql>  create table AdmissionMedicalRecord(Record_Id int auto_increment primary key, Patient_Id int, Department_Name varchar(20), Admitted_Date date, foreign key(Patient_Id, Department_Name) references AdmissionHistory(Patient_Id, Department_Name));
+ERROR 1824 (HY000): Failed to open the referenced table 'admissionhistory'
+mysql> desc admissionhistory
+    -> ;
+ERROR 1146 (42S02): Table 'hospitalmanagement.admissionhistory' doesn't exist
+mysql>  create table AdmissionMedicalRecord(Record_Id int auto_increment primary key, Patient_Id int, Department_Name varchar(20), Admitted_Date date, foreign key(Patient_Id, Department_Name) references AdmissionsHistory(Patient_Id, Department_Name));
+ERROR 1822 (HY000): Failed to add the foreign key constraint. Missing index for constraint 'admissionmedicalrecord_ibfk_1' in the referenced table 'admissionshistory'
+mysql> desc admissionshistory;
++-----------------+-------------+------+-----+---------+-------+
+| Field           | Type        | Null | Key | Default | Extra |
++-----------------+-------------+------+-----+---------+-------+
+| Admission_Id    | int         | NO   | PRI | NULL    |       |
+| Patient_Id      | int         | YES  | UNI | NULL    |       |
+| Ward_Name       | varchar(20) | YES  | MUL | NULL    |       |
+| Department_Name | varchar(20) | YES  |     | NULL    |       |
++-----------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc appointment;
+ERROR 1146 (42S02): Table 'hospitalmanagement.appointment' doesn't exist
+mysql> desc appointments;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Appointment_Id  | int         | NO   | UNI | NULL    | auto_increment |
+| Patient_Id      | int         | NO   | PRI | NULL    |                |
+| Department_Name | varchar(20) | NO   | PRI | NULL    |                |
+| Doctor_Name     | varchar(20) | NO   | PRI | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+4 rows in set (0.00 sec)
+
+mysql> drop table admissionshistory;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> drop table admissions;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> create table Admissions(Admission_Id int unique auto_increment, Patient_Id int unique, Ward_Name varchar(20), Department_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key (Ward_Name, Department_Name) references Ward(Ward_Name, Department_Name) on delete cascade, primary key(Patient_Id, Ward_Name, Department_Name));
+Query OK, 0 rows affected (0.23 sec)
+
+mysql> alter table Admissions auto_increment = 2000;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table AdmissionsHistory(Admission_Id int unique, Patient_Id int, Ward_Name varchar(20), Department_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key (Ward_Name, Department_Name) references Ward(Ward_Name, Department_Name) on delete cascade, primary key(Patient_Id, Ward_Name, Department_Name));
+Query OK, 0 rows affected (0.39 sec)
+
+mysql> alter table AdmissionsHistory auto_increment = 2000;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> drop table opdmedicalrecord;
+Query OK, 0 rows affected (0.16 sec)
+
+mysql> drop table appointmentsHistory;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> alter table Appointments modify Patient_Id unique;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'unique' at line 1
+mysql> alter table Appointments modify Patient_Id int unique;
+Query OK, 0 rows affected (0.10 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table AppointmentsHistory(Appointment_Id int unique auto_increment,Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), foreign key(Patient_Id) references Patient(Patient_Id) on delete cascade, foreign key(Doctor_Name, Department_Name) references Doctor(Doctor_Name, Department_Name) on delete cascade, primary key(Patient_Id, Department_Name, Doctor_Name));
+Query OK, 0 rows affected (0.18 sec)
+
+mysql> alter table AppointmentsHistory auto_increment = 1000;
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>  create table OpdMedicalRecord(Record_Id int primary key auto_increment, Patient_Id int, Department_Name varchar(20), Doctor_Name varchar(20), Date_Visited date, foreign key(patient_id, department_name, doctor_name) references AppointmentsHistory(patient_id, department_name, doctor_name));
+Query OK, 0 rows affected (0.14 sec)
+
+mysql>  create table AdmissionMedicalRecord(Record_Id int auto_increment primary key, Patient_Id int, Department_Name varchar(20), Admitted_Date date, foreign key(Patient_Id, Department_Name) references AdmissionsHistory(Patient_Id, Department_Name));
+ERROR 1822 (HY000): Failed to add the foreign key constraint. Missing index for constraint 'admissionmedicalrecord_ibfk_1' in the referenced table 'admissionshistory'
+mysql>  create table AdmissionMedicalRecord(Record_Id int auto_increment primary key, Patient_Id int, Department_Name varchar(20), Ward_Name varchar(20), Admitted_Date date, foreign key(Patient_Id, Ward_Name,Department_Name) references AdmissionsHistory(Patient_Id, Ward_Name, Department_Name));
+Query OK, 0 rows affected (0.15 sec)
+
+mysql> alter table AdmissionsMedicalRecord auto_increment = 8000;
+ERROR 1146 (42S02): Table 'hospitalmanagement.admissionsmedicalrecord' doesn't exist
+mysql> alter table AdmissionMedicalRecord auto_increment = 8000;
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table Hospital(Hospital_Name varchar(20) primary key);
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> alter table helpdesk add column Hospital_Name varchar(20);
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table helpdesk add foreign key(Hospital_Name) references Hospital(Hospital_Name) on delete cascade;
+Query OK, 0 rows affected (0.18 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table Department add column Hospital_Name varchar(20);
+Query OK, 0 rows affected (0.16 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> alter table department add foreign key(Hospital_Name) references Hospital(Hospital_Name) on delete cascade;
+Query OK, 0 rows affected (0.28 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc ward;
++-----------------+-------------+------+-----+---------+-------+
+| Field           | Type        | Null | Key | Default | Extra |
++-----------------+-------------+------+-----+---------+-------+
+| Ward_Name       | varchar(20) | NO   | PRI | NULL    |       |
+| Department_Name | varchar(20) | NO   | PRI | NULL    |       |
+| Doctor_Name     | varchar(20) | YES  | MUL | NULL    |       |
+| Capacity        | int         | YES  |     | NULL    |       |
++-----------------+-------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> show tables;
++------------------------------+
+| Tables_in_hospitalmanagement |
++------------------------------+
+| admissionmedicalrecord       |
+| admissions                   |
+| admissionshistory            |
+| appointments                 |
+| appointmentshistory          |
+| department                   |
+| doctor                       |
+| helpdesk                     |
+| hospital                     |
+| opdmedicalrecord             |
+| patient                      |
+| ward                         |
++------------------------------+
+12 rows in set (0.00 sec)
+
+mysql> desc opdmedicalrecord;
++-----------------+-------------+------+-----+---------+----------------+
+| Field           | Type        | Null | Key | Default | Extra          |
++-----------------+-------------+------+-----+---------+----------------+
+| Record_Id       | int         | NO   | PRI | NULL    | auto_increment |
+| Patient_Id      | int         | YES  | MUL | NULL    |                |
+| Department_Name | varchar(20) | YES  |     | NULL    |                |
+| Doctor_Name     | varchar(20) | YES  |     | NULL    |                |
+| Date_Visited    | date        | YES  |     | NULL    |                |
++-----------------+-------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> desc patient;
++----------------+-------------------------------+------+-----+---------+----------------+
+| Field          | Type                          | Null | Key | Default | Extra          |
++----------------+-------------------------------+------+-----+---------+----------------+
+| Patient_Id     | int                           | NO   | PRI | NULL    | auto_increment |
+| Patient_Name   | varchar(20)                   | YES  |     | NULL    |                |
+| Age            | int                           | YES  |     | NULL    |                |
+| Gender         | enum('Male','Female','Other') | YES  |     | NULL    |                |
+| Phone_No       | mediumtext                    | YES  |     | NULL    |                |
+| Patient_Type   | enum('OPD','ADMISSION')       | YES  |     | NULL    |                |
+| Admission_Days | int                           | YES  |     | 0       |                |
++----------------+-------------------------------+------+-----+---------+----------------+
+7 rows in set (0.00 sec)
+
+mysql> show create table opdmedicalrecord;
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table            | Create Table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| opdmedicalrecord | CREATE TABLE `opdmedicalrecord` (
+  `Record_Id` int NOT NULL AUTO_INCREMENT,
+  `Patient_Id` int DEFAULT NULL,
+  `Department_Name` varchar(20) DEFAULT NULL,
+  `Doctor_Name` varchar(20) DEFAULT NULL,
+  `Date_Visited` date DEFAULT NULL,
+  PRIMARY KEY (`Record_Id`),
+  KEY `Patient_Id` (`Patient_Id`,`Department_Name`,`Doctor_Name`),
+  CONSTRAINT `opdmedicalrecord_ibfk_1` FOREIGN KEY (`Patient_Id`, `Department_Name`, `Doctor_Name`) REFERENCES `appointmentshistory` (`Patient_Id`, `Department_Name`, `Doctor_Name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> insert into Hospital values("KMC Manipal");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into helpdesk values("KMC");
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> show create table helpdesk;
++----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table    | Create Table                                                                                                                                                                                                                                                                                                                                                                                            |
++----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| helpdesk | CREATE TABLE `helpdesk` (
+  `Helpdesk_Id` int NOT NULL AUTO_INCREMENT,
+  `Hospital_Name` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`Helpdesk_Id`),
+  KEY `Hospital_Name` (`Hospital_Name`),
+  CONSTRAINT `helpdesk_ibfk_1` FOREIGN KEY (`Hospital_Name`) REFERENCES `hospital` (`Hospital_Name`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=200 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++----------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> insert into helpdesk (Hospital_Name) values ("KMC");
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`hospitalmanagement`.`helpdesk`, CONSTRAINT `helpdesk_ibfk_1` FOREIGN KEY (`Hospital_Name`) REFERENCES `hospital` (`Hospital_Name`) ON DELETE CASCADE)
+mysql> insert into helpdesk (Hospital_Name) values ("KMC Manipal");
+Query OK, 1 row affected (0.01 sec)
+
+mysql> create table PaymentPending(PAppointment_Id int, Amount int, foreign key(Appointment_Id) references Appointments(Appointment_Id))
+    -> create table PaymentPending(PAppointment_Id int, Amount int, foreign key(Appointment_Id) references Appointments(Appointment_;Id))
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'create table PaymentPending(PAppointment_Id int, Amount int, foreign key(Appoint' at line 2
+    -> ^C
+mysql> create table PaymentPending(Payment_Id int auto_increment primary key,Appointment_Id int, Amount int, foreign key(Appointment_Id) references Appointments(Appointment_Id)) ;
+Query OK, 0 rows affected (0.15 sec)
+
+mysql> alter table PaymentPending auto_increment = 5000;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> create table PaymentHistory(Payment_Id int auto_increment primary key,Appointment_Id int, Amount int) ;
+Query OK, 0 rows affected (0.12 sec)
+
+mysql> drop table PaymentHistory;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> show create table AppointmentHistory;
+ERROR 1146 (42S02): Table 'hospitalmanagement.appointmenthistory' doesn't exist
+mysql> show create table Appoints\mentHistory;
+ERROR:
+Unknown command '\m'.
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\mentHistory' at line 1
+mysql> show create table AppointsmentHistory;
+ERROR 1146 (42S02): Table 'hospitalmanagement.appointsmenthistory' doesn't exist
+mysql> show create table AppointmentsHistory;
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Table               | Create Table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| AppointmentsHistory | CREATE TABLE `appointmentshistory` (
+  `Appointment_Id` int NOT NULL AUTO_INCREMENT,
+  `Patient_Id` int NOT NULL,
+  `Department_Name` varchar(20) NOT NULL,
+  `Doctor_Name` varchar(20) NOT NULL,
+  PRIMARY KEY (`Patient_Id`,`Department_Name`,`Doctor_Name`),
+  UNIQUE KEY `Appointment_Id` (`Appointment_Id`),
+  KEY `Doctor_Name` (`Doctor_Name`,`Department_Name`),
+  CONSTRAINT `appointmentshistory_ibfk_1` FOREIGN KEY (`Patient_Id`) REFERENCES `patient` (`Patient_Id`) ON DELETE CASCADE,
+  CONSTRAINT `appointmentshistory_ibfk_2` FOREIGN KEY (`Doctor_Name`, `Department_Name`) REFERENCES `doctor` (`Doctor_Name`, `Department_Name`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
++---------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+mysql>
