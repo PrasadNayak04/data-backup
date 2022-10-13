@@ -42,8 +42,6 @@ public class DoctorService implements DoctorServices, HelpdeskDoctorServices{
     }
 
     public void consultPatient(Appointment appointment) {
-        OpdMedicalRecord opdMedicalRecord = new OpdMedicalRecord(appointment.getPatientId(), appointment.getDepartmentName(), appointment.getDoctorName(), LocalDate.now());
-        updateOpdMedicalRecord(opdMedicalRecord);
         int amount = (int)(Math.random() * 500);
         generatePayment(new Payment(appointment.getAppointmentId(), amount));
     }

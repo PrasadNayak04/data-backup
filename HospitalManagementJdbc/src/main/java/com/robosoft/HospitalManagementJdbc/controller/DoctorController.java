@@ -16,13 +16,10 @@ public class DoctorController {
     @Autowired
     private DoctorServices doctorServices;
 
-    @Autowired
-    private HelpdeskDoctorServices helpdeskDoctorServices;
-
     @GetMapping("/viewAppointments/{doctorName}/{departmentName}")
-    public List<Appointment> viewAppointments(@PathVariable String departmentName, @PathVariable String doctorName)
+    public List<Appointment> viewAppointments(@PathVariable String doctorName, @PathVariable String departmentName)
     {
-        return doctorServices.getAppointments(departmentName, doctorName);
+        return doctorServices.getAppointments(doctorName, departmentName);
     }
 
     @PutMapping("/consult")

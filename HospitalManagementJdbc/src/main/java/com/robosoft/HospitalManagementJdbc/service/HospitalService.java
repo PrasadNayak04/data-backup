@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class HospitalService implements HospitalServices, HospitalHelpdeskServic
     private String query;
     @Override
     public String addDepartment(Department department) {
-        query = "insert into department (Department_Name, Hospital_Name) values (?)";
+        query = "insert into department (Department_Name, Hospital_Name) values (?, ?)";
         jdbcTemplate.update(query, department.getDepartmentName(), department.getHospitalName());
         return "New department added";
     }
@@ -55,9 +56,6 @@ public class HospitalService implements HospitalServices, HospitalHelpdeskServic
     public String bookAppointment(Appointment appointment) {
         query = "insert into Appointments (Patient_Id, Department_Name, Doctor_Name) values (?,?,?)";
         jdbcTemplate.update(query, appointment.getPatientId(), appointment.getDepartmentName(), appointment.getDoctorName());
-        query = "insert into AppointmentsHistory(Patient_Id, Department_Name, Doctor_Name) values (?,?,?)";
-        jdbcTemplate.update(query, appointment.getPatientId(), appointment.getDepartmentName(), appointment.getDoctorName());
-
         return "Appointment booking successful";
     }
 
@@ -72,14 +70,25 @@ public class HospitalService implements HospitalServices, HospitalHelpdeskServic
 
     @Override
     public Doctor findDoctor(String doctorName, String departmentName) {
-        query = "select * from Doctor where Doctor_Name = '"+ doctorName + "' and Department_Name = '" + departmentName + "'";
-        return jdbcTemplate.queryForObject(query, Doctor.class);
+        query = "select Doctor_Id, Doctor_Name, Department_Name from Doctor where Doctor_Name = '"+ doctorName + "' and Department_Name = '" + departmentName + "'";
+        return jdbcTemplate.queryForObject(query, (resultSet, no)-> {Doctor doctor = new Doctor();
+        doctor.setDoctorId(resultSet.getInt(1));
+        doctor.setDoctorName(resultSet.getString(2));
+        doctor.setDepartmentName(resultSet.getString(3));
+        return doctor;
+        });
     }
 
     @Override
     public Ward findWArd(String wardName, String departmentName) {
         query = "select * from Ward where Ward_Name = '"+ wardName + "' and Department_Name = '" + departmentName + "'";
-        return jdbcTemplate.queryForObject(query, Ward.class);
+        return jdbcTemplate.queryForObject(query, (resultSet, no)-> {Ward ward = new Ward();
+            ward.setWardName(resultSet.getString(1));
+            ward.setDepartmentName(resultSet.getString(2));
+            ward.setDoctorName(resultSet.getString(3));
+            ward.setCapacity(resultSet.getInt(4));
+            return ward;
+        });
     }
 
     @Override
@@ -90,14 +99,31 @@ public class HospitalService implements HospitalServices, HospitalHelpdeskServic
 
     @Override
     public void updateOpdMedicalRecord(OpdMedicalRecord opdMedicalRecord) {
-        query = "insert into OpdMedicalRecord (Patient_Id, DepartmentName, Doctor_Name, Date_Visited) values(?,?,?,?)";
+        query = "insert into OpdMedicalRecord (Patient_Id, Department_Name, Doctor_Name, Date_Visited) values(?,?,?,?)";
         jdbcTemplate.update(query, opdMedicalRecord.getPatientId(), opdMedicalRecord.getDepartmentName(), opdMedicalRecord.getDoctorName(), opdMedicalRecord.getDateVisited());
     }
 
     @Override
     public void closeAppointments(int appointmentId) {
+        //retrieve appointment to put into appointment history
+        query = "select * from Appointments where Appointment_Id = " + appointmentId;
+        Appointment appointment = jdbcTemplate.queryForObject(query, (resultSet, no)-> { Appointment appointment1 = new Appointment();
+            appointment1.setAppointmentId(resultSet.getInt(1));
+            appointment1.setPatientId(resultSet.getInt(2));
+            appointment1.setDepartmentName(resultSet.getString(3));
+            appointment1.setDoctorName(resultSet.getString(4));
+            return appointment1;
+        });
+
         query = "delete from Appointments where Appointment_Id = ?";
         jdbcTemplate.update(query, appointmentId);
+
+        query = "insert into AppointmentsHistory values(?,?,?,?)";
+        jdbcTemplate.update(query, appointment.getAppointmentId(), appointment.getPatientId(), appointment.getDepartmentName(), appointment.getDoctorName());
+
+        OpdMedicalRecord opdMedicalRecord = new OpdMedicalRecord(appointment.getPatientId(), appointment.getDepartmentName(), appointment.getDoctorName(), LocalDate.now());
+        updateOpdMedicalRecord(opdMedicalRecord);
+
     }
 
     @Override
@@ -147,13 +173,13 @@ public class HospitalService implements HospitalServices, HospitalHelpdeskServic
 
     @Override
     public int getPaymentByAppointmentId(int appointmentId) {
-        query = "select Amount from PaymentPending where AppointmentId = " + appointmentId;
+        query = "select Amount from PaymentPending where Appointment_Id = " + appointmentId;
         return jdbcTemplate.queryForObject(query, Integer.class);
     }
 
     @Override
     public boolean isAvailable(Doctor doctor) {
-        query = "select count(Doctor_Id) from Appointments where Doctor_Id = '" + doctor.getDoctorId() + "' and Department_Name = '" + doctor.getDepartmentName() + "'";
+        query = "select count(Doctor_Name) from Appointments where Doctor_Name = '" + doctor.getDoctorName() + "' and Department_Name = '" + doctor.getDepartmentName() + "'";
         int count = jdbcTemplate.queryForObject(query, Integer.class);
         if(count > 3){
             return false;

@@ -32,4 +32,5 @@ public class HospitalController {
         hospitalServices.addWard(ward);
     }
 
+
 }

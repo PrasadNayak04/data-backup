@@ -49,7 +49,7 @@ public class HelpdeskController {
         return helpdeskService.isAvailable(doctorName, departmentName);
     }
 
-    @GetMapping("/availableDoctor/{departmentName}")
+    @GetMapping("/availableDoctors/{departmentName}")
     public List<String> availableDoctorsInDepartment(@PathVariable String departmentName){
         return helpdeskService.viewAllAvailableDoctors(departmentName);
     }
@@ -69,5 +69,8 @@ public class HelpdeskController {
         return helpdeskService.makePayment(patientId, amount);
     }
 
-
+    @GetMapping("/Ward/{wardName}/{departmentName}")
+    public Ward findWard(@PathVariable String wardName, @PathVariable String departmentName){
+       return helpdeskService.findWArd(wardName, departmentName);
+    }
 }

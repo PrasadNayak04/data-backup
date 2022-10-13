@@ -1,21 +1,17 @@
 package com.robosoft.HospitalManagementJdbc.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Appointment {
 
     private int AppointmentId;
     private int patientId;
     private String departmentName;
     private String doctorName;
-
-    public Appointment(int patientId, String departmentName, String doctorName) {
-        this.patientId = patientId;
-        this.departmentName = departmentName;
-        this.doctorName = doctorName;
-    }
 
 }
