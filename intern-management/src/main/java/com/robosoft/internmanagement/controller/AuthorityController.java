@@ -1,6 +1,5 @@
 package com.robosoft.internmanagement.controller;
 
-
 import com.robosoft.internmanagement.modelAttributes.Applications;
 import com.robosoft.internmanagement.modelAttributes.AssignBoard;
 import com.robosoft.internmanagement.service.AuthorityService;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/intern-management/Authority")
+@RequestMapping("/intern-management/authority")
 public class AuthorityController
 {
     @Autowired

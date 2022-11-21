@@ -5,6 +5,7 @@ import com.robosoft.internmanagement.modelAttributes.Applications;
 import com.robosoft.internmanagement.modelAttributes.AssignBoard;
 import com.robosoft.internmanagement.modelAttributes.CandidateInvites;
 import com.robosoft.internmanagement.service.EmailService;
+import com.robosoft.internmanagement.service.MemberService;
 import com.robosoft.internmanagement.service.RecruiterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,10 @@ public class RecruiterController
     EmailService emailService;
 
     @Autowired
-    RecruiterService recruiterService;
+    private RecruiterService recruiterService;
+
+    @Autowired
+    private MemberService memberService;
 
     @PostMapping("/candidate-invitation")
     public ResponseEntity<String> invites(@ModelAttribute CandidateInvites invites)
@@ -33,20 +37,23 @@ public class RecruiterController
         if (result){
             return ResponseEntity.ok().body("Invite sent to " + invites.getCandidateName());
         }else {
-            return ResponseEntity.status(HttpStatus.valueOf("Insufficient information")).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
     @GetMapping("/organizers")
-    public List<Organizer> getList(@RequestParam String emailId)
+    public ResponseEntity<?> getOrganizersList(@RequestParam (required = false) Integer limit)
     {
-        return recruiterService.getOrganizer(emailId);
+        if(!memberService.validPageDetails(1, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid limit count");
+        }
+        return ResponseEntity.ok(recruiterService.getOrganizer(limit));
     }
 
     @GetMapping("/summary")
-    public Summary getSummary()
+    public Summary getSummary(@RequestParam Date date)
     {
-        return recruiterService.getSummary();
+        return recruiterService.getSummary(date);
     }
 
     @GetMapping("/cv-count")
@@ -68,9 +75,12 @@ public class RecruiterController
     }
 
     @GetMapping("/cv-analysis")
-    public List<CvAnalysis> getCv (@RequestParam(required = false) Date date)
+    public ResponseEntity<?> getCv (@RequestParam(required = false) Date date, @RequestParam int pageNo, int limit)
     {
-        return recruiterService.cvAnalysisPage(date);
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+        return ResponseEntity.ok(recruiterService.cvAnalysisPage(date, pageNo, limit));
     }
 
     @GetMapping("/search/{designation}")
@@ -92,21 +102,21 @@ public class RecruiterController
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(technologies);
     }
 
-    @GetMapping("/extended-cv/{emailId}")
-    public ResponseEntity<?> getExtendedCV(@PathVariable String emailId){
-        ExtendedCV extendedCV = recruiterService.getBasicCVDetails(emailId);
+    @GetMapping("/extended-cv/{applicationId}")
+    public ResponseEntity<?> getExtendedCV(@PathVariable int applicationId){
+        ExtendedCV extendedCV = recruiterService.getBasicCVDetails(applicationId);
         if(extendedCV == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No candidate found with email " + emailId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No candidate found with application Id " + applicationId);
         }
-        extendedCV.setEducations(recruiterService.getEducationsHistory(emailId));
-        extendedCV.setWorkHistories(recruiterService.getWorkHistory(emailId));
-        extendedCV.setLinks(recruiterService.getSocialLinks(emailId));
+        extendedCV.setEducations(recruiterService.getEducationsHistory(applicationId));
+        extendedCV.setWorkHistories(recruiterService.getWorkHistory(applicationId));
+        extendedCV.setLinks(recruiterService.getSocialLinks(applicationId));
         return ResponseEntity.ok(extendedCV);
     }
 
-    @GetMapping("/resume-url/{emailId}")
-    public ResponseEntity<?> getResumeDownloadUrl(@PathVariable String emailId){
-        String url = recruiterService.downloadCV(emailId);
+    @GetMapping("/resume-url/{applicationId}")
+    public ResponseEntity<?> getResumeDownloadUrl(@PathVariable int applicationId){
+        String url = recruiterService.downloadCV(applicationId);
         if(url.equals(null))
         {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -116,8 +126,11 @@ public class RecruiterController
 
     //pagination
     @GetMapping("/profiles/{designation}/{status}")
-    public ResponseEntity<?> getProfileBasedOnStatus(@PathVariable String designation, @PathVariable String status) {
-        return ResponseEntity.status(HttpStatus.FOUND).body(recruiterService.getProfileBasedOnStatus(designation, status));
+    public ResponseEntity<?> getProfileBasedOnStatus(@PathVariable String designation, @PathVariable String status, @RequestParam int pageNo, @RequestParam int limit) {
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+        return ResponseEntity.status(HttpStatus.FOUND).body(recruiterService.getProfileBasedOnStatus(designation, status, pageNo, limit));
     }
 
     @GetMapping("/applicants")
@@ -127,7 +140,7 @@ public class RecruiterController
     }
 
     @PutMapping("/organizer-assignation")
-    public ResponseEntity<String> setOrganizer(@ModelAttribute AssignBoard assignBoard)
+    public ResponseEntity<?> setOrganizer(@ModelAttribute AssignBoard assignBoard)
     {
         String result = recruiterService.assignOrganizer(assignBoard);
         if(result==null)
@@ -138,15 +151,73 @@ public class RecruiterController
     }
 
     @GetMapping("/assignboard")
-    public List<AssignBoardPage> getPage()
+    public ResponseEntity<?> getPage(@RequestParam int pageNo, @RequestParam int limit)
     {
-        return recruiterService.getAssignBoardPage();
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+        return ResponseEntity.ok(recruiterService.getAssignBoardPage(pageNo, limit));
     }
 
     @GetMapping("/rejected-cv")
-    public List<RejectedCv> getCvPage()
+    public ResponseEntity<?> getCvPage(@RequestParam int pageNo, @RequestParam int limit)
     {
-        return recruiterService.getRejectedCvPage();
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+
+        List<?> rejectedCvs = recruiterService.getRejectedCvPage(pageNo, limit);
+        if(rejectedCvs.size() > 0){
+            return ResponseEntity.status(HttpStatus.FOUND).body(rejectedCvs);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping("/invites-info")
+    public ResponseEntity<Invite> getInfo()
+    {
+        if(recruiterService.getInviteInfo() == null){
+            ResponseEntity.status(HttpStatus.NO_CONTENT);
+        }
+        return ResponseEntity.ok(recruiterService.getInviteInfo());
+    }
+
+    @GetMapping("/invites-by-day")
+    public ResponseEntity<?> getByDay(@RequestParam Date date, @RequestParam int pageNo, @RequestParam int limit)
+    {
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+        return ResponseEntity.ok(recruiterService.getByDay(date, pageNo, limit));
+    }
+
+    @GetMapping("/invites-by-month")
+    public ResponseEntity<?> getByMonth(@RequestParam Date date, @RequestParam int pageNo, @RequestParam int limit)
+    {
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+        return ResponseEntity.ok(recruiterService.getByMonth(date, pageNo, limit));
+    }
+
+    @GetMapping("/invites-by-year")
+    public ResponseEntity<?> getByYear(@RequestParam Date date, @RequestParam int pageNo, @RequestParam int limit)
+    {
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+        return ResponseEntity.ok(recruiterService.getByYear(date, pageNo, limit));
+    }
+
+    @PutMapping("/resend-invite")
+    public String resendInvite(@RequestParam int inviteId)
+    {
+        boolean result = emailService.resendInvite(inviteId);
+        if (result)
+        {
+            return "Invite sent";
+        }
+        return "Failed";
     }
 
 }

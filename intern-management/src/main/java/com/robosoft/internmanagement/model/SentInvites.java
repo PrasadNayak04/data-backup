@@ -3,14 +3,13 @@ package com.robosoft.internmanagement.model;
 import lombok.Data;
 
 @Data
-public class RejectedCv
+public class SentInvites
 {
 
-    private int applicationId;
+    private int candidateInviteId;
     private String name;
-    private String imageUrl;
     private String designation;
     private String location;
-    private long mobileNumber;
+    private String email;
 
 }

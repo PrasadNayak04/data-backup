@@ -30,8 +30,11 @@ public class MemberController {
     private MemberService memberService;
 
     @GetMapping("/notifications")
-    public ResponseEntity<?> getNotifications(){
-        return ResponseEntity.ok(memberService.getNotifications());
+    public ResponseEntity<?> getNotifications(@RequestParam int pageNo, @RequestParam int limit){
+        if(!memberService.validPageDetails(pageNo, limit)){
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid page details");
+        }
+        return ResponseEntity.ok(memberService.getNotifications(pageNo, limit));
     }
 
     @PostMapping("/event-creation")
